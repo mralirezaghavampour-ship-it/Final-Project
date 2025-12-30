@@ -114,6 +114,7 @@ def main():
     else:
         print("❌ مناسب مسیر قهرمانی نیست")
 
+
     print(f"امتیاز کل: {final_score:.2f}")
 
 if __name__ == "__main__":
