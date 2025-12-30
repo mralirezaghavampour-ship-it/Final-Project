@@ -1,52 +1,56 @@
-دیتاست استعداد‌یابی کاراته (University Dataset)
+import random
+import csv
 
-تعریف:
-هر سطر = یک ورزشکار
-هر ستون = یکی از ورودی‌های برنامه
-ستون آخر = برچسب نهایی استعداد (نظر مربی / ارزیابی کلی)
+# تولید دیتاست مصنوعی 500 ورزشکار
+dataset = []
+for i in range(500):
+    age = random.randint(10, 20)
+    weight = random.randint(40, 80)
+    height = random.randint(140, 185)
+    BMI = round(weight / (height/100)**2,2)
+    flexibility = random.randint(20, 50)
+    strength = random.randint(50, 100)
+    reaction_time = round(random.uniform(0.2, 0.4), 2)
+    speed = round(random.uniform(1.0, 1.5), 2)
+    balance = random.randint(70, 100)
+    hand_eye = random.randint(70, 100)
+    focus = random.randint(70, 100)
+    motivation = random.randint(70, 100)
+    years_training = random.randint(0, 5)
 
-فرمت فایل: karate_dataset.csv
-age,height_cm,weight_kg,injury,experience_years,flexibility,reaction,cardio,image_width,image_height,video_size_mb,talent_label
-16,165,55,0,2,1,1,1,800,800,6.2,2
-18,170,62,0,3,1,1,1,1024,1024,10.5,2
-20,175,70,0,4,1,1,0,640,640,5.1,1
-22,178,82,1,5,0,1,0,800,600,4.0,1
-15,158,50,0,1,1,0,1,600,600,3.5,1
-17,168,60,0,2,1,1,1,900,900,7.8,2
-19,172,75,1,3,0,0,0,500,500,2.1,0
-21,180,85,1,6,0,1,0,640,480,3.0,0
-14,155,48,0,1,1,0,1,700,700,4.2,1
-23,176,68,0,7,1,1,1,1200,900,12.0,2
+    # محاسبه نمره استعداد
+    talent_score = round(
+        0.2* (flexibility/50) +
+        0.2* (strength/100) +
+        0.2* (1 - reaction_time/0.4) +
+        0.1* (1.5 - speed)/0.5 +
+        0.1* (balance/100) +
+        0.1* (hand_eye/100) +
+        0.05* (focus/100) +
+        0.05* (motivation/100),
+        2
+    )
 
-تعریف ستون‌ها (برای گزارش)
+    # پیش‌بینی استعداد
+    talent_class = "مستعد" if talent_score >= 0.7 else "غیرمستعد"
 
-age : سن (سال)
+    dataset.append([
+        i+1, age, weight, height, BMI, flexibility, strength, reaction_time,
+        speed, balance, hand_eye, focus, motivation, years_training, talent_score, talent_class
+    ])
 
-height_cm : قد (سانتی‌متر)
+# ذخیره دیتاست در فایل CSV
+with open("karate_talent_dataset.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    # عنوان ستون‌ها
+    writer.writerow([
+        "id","age","weight","height","BMI","flexibility","strength","reaction_time",
+        "speed","balance","hand_eye","focus","motivation","years_training",
+        "talent_score","talent_class"
+    ])
+    # نوشتن داده‌ها
+    writer.writerows(dataset)
 
-weight_kg : وزن (کیلوگرم)
-
-injury : آسیب فعال (0 = خیر، 1 = بله)
-
-experience_years : سابقه تمرین رزمی (سال)
-
-flexibility : انعطاف‌پذیری (0/1)
-
-reaction : سرعت واکنش (0/1)
-
-cardio : توان هوازی (0/1)
-
-image_width ، image_height : مشخصات تصویر
-
-video_size_mb : حجم ویدئوی تمرین
-
-talent_label :
-
-0 = استعداد پایین
-
-1 = متوسط
-
-2 = بالا
+print("دیتاست 500 نمونه‌ای تولید شد و در karate_talent_dataset.csv ذخیره شد.")
 
 
-«دیتاست مورد استفاده شامل اطلاعات فیزیولوژیک، سابقه تمرینی و داده‌های چندرسانه‌ای ورزشکاران کاراته بوده که به‌صورت ساخت‌یافته و شبیه‌سازی‌شده برای اهداف آموزشی و دانشگاهی تهیه شده است.»
