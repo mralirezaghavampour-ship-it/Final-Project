@@ -1,0 +1,120 @@
+from PIL import Image
+import os
+import tkinter as tk
+from tkinter import filedialog
+
+# ------------------ مرحله متنی (تخصصی‌تر) ------------------
+def text_score(age, bmi, injury, experience, flexibility, reaction, cardio):
+    score = 0.0
+
+    if 12 <= age <= 25:
+        score += 0.2
+
+    if 18.5 <= bmi <= 25:
+        score += 0.2
+
+    if not injury:
+        score += 0.2
+
+    if experience >= 2:
+        score += 0.15
+
+    if flexibility:
+        score += 0.1
+
+    if reaction:
+        score += 0.1
+
+    if cardio:
+        score += 0.05
+
+    return score
+
+# ------------------ مرحله تصویر ------------------
+def image_score(image_path):
+    if not image_path or not os.path.isfile(image_path):
+        return 0.0
+
+    try:
+        img = Image.open(image_path)
+        w, h = img.size
+
+        if w >= 600 and h >= 600:
+            return 0.15
+        elif w >= 400 and h >= 400:
+            return 0.1
+        else:
+            return 0.05
+    except:
+        return 0.0
+
+# ------------------ مرحله ویدئو (بدون OpenCV) ------------------
+def video_score(video_path):
+    if not video_path or not os.path.isfile(video_path):
+        return 0.0
+
+    file_size_mb = os.path.getsize(video_path) / (1024 * 1024)
+
+    score = 0.0
+
+    # فایل واقعی تمرین (نه ویدئوی خالی)
+    if file_size_mb >= 5:
+        score += 0.15
+    elif file_size_mb >= 2:
+        score += 0.1
+    else:
+        score += 0.05
+
+    return score
+
+# ------------------ برنامه اصلی ------------------
+def main():
+    print("🥋 سیستم استعداد‌یابی کاراته (نسخه سازگار با Python 3.14) 🥋\n")
+
+    age = int(input("سن: "))
+    height = float(input("قد (cm): "))
+    weight = float(input("وزن (kg): "))
+    injury = input("آسیب فعال زانو/مچ؟ (y/n): ").lower() == 'y'
+
+    experience = int(input("سابقه تمرین رزمی (سال): "))
+    flexibility = input("انعطاف‌پذیری بالا داری؟ (y/n): ").lower() == 'y'
+    reaction = input("واکنش سریع داری؟ (y/n): ").lower() == 'y'
+    cardio = input("توان هوازی خوب داری؟ (y/n): ").lower() == 'y'
+
+    bmi = weight / ((height / 100) ** 2)
+    score_text = text_score(age, bmi, injury, experience, flexibility, reaction, cardio)
+
+    print(f"\nBMI: {bmi:.2f}")
+    print(f"امتیاز مرحله متنی: {score_text:.2f}")
+
+    root = tk.Tk()
+    root.withdraw()
+
+    image_path = filedialog.askopenfilename(
+        title="انتخاب تصویر",
+        filetypes=[("Image files", "*.jpg *.jpeg *.png")]
+    )
+    score_img = image_score(image_path)
+    print(f"امتیاز تصویر: {score_img:.2f}")
+
+    video_path = filedialog.askopenfilename(
+        title="انتخاب ویدئو تمرین",
+        filetypes=[("Video files", "*.mp4 *.avi *.mov")]
+    )
+    score_vid = video_score(video_path)
+    print(f"امتیاز ویدئو: {score_vid:.2f}")
+
+    final_score = min(score_text + score_img + score_vid, 1.0)
+
+    print("\n📊 نتیجه نهایی:")
+    if final_score >= 0.75:
+        print("✅ استعداد بالا برای کاراته")
+    elif final_score >= 0.55:
+        print("⚠️ پتانسیل متوسط – نیاز به تمرین هدفمند")
+    else:
+        print("❌ مناسب مسیر قهرمانی نیست")
+
+    print(f"امتیاز کل: {final_score:.2f}")
+
+if __name__ == "__main__":
+    main()
